@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:private_gitlab_notifier/common/cli_util.dart';
+import 'package:private_gitlab_notifier/common/exit_code.dart';
 import 'package:private_gitlab_notifier/dashboard_service.dart';
 import 'package:private_gitlab_notifier/merge_request_watcher.dart';
 import 'package:private_gitlab_notifier/model/mixed_changes.dart';
@@ -15,8 +16,7 @@ import 'package:http/http.dart' as http;
 
 void main(List<String> arguments) async {
   if (!Platform.isMacOS && !Platform.isWindows) {
-    print('This program only works on MacOS and Windows');
-    exitWith(-1);
+    exitWith(ExitReason.unsupportedPlatform);
   }
 
   final env = SettingsEnv.init();
@@ -29,9 +29,8 @@ void main(List<String> arguments) async {
     accessToken = env.accessToken;
     projectId = env.projectId;
     fetchIntervalInMilliSecond = env.fetchIntervalInMilliSecond;
-  } on SettingValueExcception catch (e) {
-    print(e);
-    exitWith(-2);
+  } on SettingValueExcception {
+    exitWith(ExitReason.settingValueError);
   }
   final client = http.Client();
   final repo = Repository(
@@ -44,7 +43,13 @@ void main(List<String> arguments) async {
     repo,
     client,
   );
-  final dashboardService = await DashboardService.start();
+
+  late final DashboardService dashboardService;
+  try {
+    dashboardService = await DashboardService.start();
+  } on DashboardServiceException {
+    exitWith(ExitReason.dashboardNotStarted);
+  }
   final wsServer = await WebSocketServer.start();
 
   do {
@@ -90,5 +95,5 @@ void main(List<String> arguments) async {
     await Future.delayed(Duration(milliseconds: fetchIntervalInMilliSecond));
   } while (dashboardService.isRunning());
 
-  exitWith(1);
+  exitWith(ExitReason.success);
 }

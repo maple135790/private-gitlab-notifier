@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:private_gitlab_notifier/common/cli_util.dart';
+
 class DashboardService {
   final Process _process;
   bool _isRunning = true;
@@ -21,6 +23,13 @@ class DashboardService {
       ],
       runInShell: true,
     );
+
+    final isServiceRunning = checkPid(process.pid, 'Dashboard');
+
+    if (!isServiceRunning) {
+      throw DashboardServiceException('Failed to start dashboard');
+    }
+
     print('Dashboard is running at http://localhost:$dashboardPort');
     return DashboardService._(process);
   }
@@ -33,15 +42,7 @@ class DashboardService {
   }
 
   bool isRunning() {
-    if (Platform.isMacOS) {
-      final result = Process.runSync('kill', ['-0', '$_pid']);
-      return result.exitCode == 0;
-    } else if (Platform.isWindows) {
-      final result =
-          Process.runSync('tasklist', ['/nh', '/fi', 'PID eq $_pid']);
-      return result.stdout.toString().contains(_pid.toString());
-    }
-    throw UnsupportedError('Unsupported platform');
+    return checkPid(_pid, 'Dashboard');
   }
 
   void stop() {
@@ -50,4 +51,13 @@ class DashboardService {
     _process.kill();
     _isRunning = false;
   }
+}
+
+class DashboardServiceException implements Exception {
+  final String message;
+
+  DashboardServiceException(this.message);
+
+  @override
+  String toString() => message;
 }
