@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:private_gitlab_notifier/common/cli_util.dart';
+import 'package:path/path.dart' as p;
+
 class SettingsEnv {
   static const _defaultFetchIntervalInMilliSecond = 5000;
   final File _envFile;
@@ -7,7 +10,8 @@ class SettingsEnv {
   const SettingsEnv._(this._envFile);
 
   factory SettingsEnv.init() {
-    final env = File('.env');
+    final envPath = p.join(scriptDirPath, '.env');
+    final env = File(envPath);
 
     return SettingsEnv._(env);
   }

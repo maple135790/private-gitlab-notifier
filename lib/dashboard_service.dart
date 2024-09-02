@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:private_gitlab_notifier/common/cli_util.dart';
+import 'package:path/path.dart' as p;
 
 class DashboardService {
   final Process _process;
@@ -12,6 +13,7 @@ class DashboardService {
 
   static Future<DashboardService> start() async {
     final dashboardPort = await _findAvailablePort();
+    final dashboardPath = p.join(scriptDirPath, 'web');
 
     final process = await Process.start(
       'dhttpd',
@@ -19,7 +21,7 @@ class DashboardService {
         '--port',
         dashboardPort.toString(),
         '--path',
-        'web',
+        dashboardPath,
       ],
       runInShell: true,
     );

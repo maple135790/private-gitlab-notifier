@@ -1,6 +1,17 @@
 import 'dart:io';
 
 import 'package:private_gitlab_notifier/common/exit_code.dart';
+import 'package:path/path.dart' as p;
+
+String get scriptDirPath {
+  late final String path;
+  if (Platform.isWindows) {
+    path = p.windows.dirname(Platform.script.toFilePath());
+  } else {
+    path = p.dirname(Platform.script.toFilePath());
+  }
+  return path;
+}
 
 void exitWith(ExitReason exitCode) {
   print('');
