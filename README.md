@@ -14,6 +14,6 @@ in `lib/`, and example unit test in `test/`.
 ```env
 domain=<private-gitlab的host。e.g. private_gl.com>
 access_token=<gitlab token，需要API權限>
-fetch_interval=<fetch gitlab 時間間格，預設1500(ms)>
+fetch_interval=<fetch gitlab 時間間格，預設5000(ms)>
 project_id=<專案ID>
 ```
