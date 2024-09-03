@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:private_gitlab_notifier/common/cli_util.dart';
 import 'package:private_gitlab_notifier/common/exit_code.dart';
 import 'package:private_gitlab_notifier/dashboard_service.dart';
@@ -15,10 +13,6 @@ import 'package:private_gitlab_notifier/web_socket_server.dart';
 import 'package:http/http.dart' as http;
 
 void main(List<String> arguments) async {
-  if (!Platform.isMacOS && !Platform.isWindows) {
-    exitWith(ExitReason.unsupportedPlatform);
-  }
-
   final env = SettingsEnv.init();
   late final String accessToken;
   late final String gitlabDomain;
@@ -29,8 +23,11 @@ void main(List<String> arguments) async {
     accessToken = env.accessToken;
     projectId = env.projectId;
     fetchIntervalInMilliSecond = env.fetchIntervalInMilliSecond;
-  } on SettingValueExcception {
-    exitWith(ExitReason.settingValueError);
+  } on SettingValueExcception catch (e) {
+    exitWith(
+      ExitReason.settingValueError,
+      message: e.message,
+    );
   }
   final client = http.Client();
   final repo = Repository(
@@ -47,8 +44,11 @@ void main(List<String> arguments) async {
   late final DashboardService dashboardService;
   try {
     dashboardService = await DashboardService.start();
-  } on DashboardServiceException {
-    exitWith(ExitReason.dashboardNotStarted);
+  } on DashboardServiceException catch (e) {
+    exitWith(
+      ExitReason.dashboardNotStarted,
+      message: e.message,
+    );
   }
   final wsServer = await WebSocketServer.start();
 

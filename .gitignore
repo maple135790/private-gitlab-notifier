@@ -4,6 +4,8 @@
 .packages
 build/
 pubspec.lock
+bin/web/
+web/
 
 # dotenv environment variables file
 .env*

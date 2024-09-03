@@ -12,6 +12,8 @@ class DashboardService {
   int get _pid => _process.pid;
 
   static Future<DashboardService> start() async {
+    _checkInstruction();
+
     final dashboardPort = await _findAvailablePort();
     final dashboardPath = p.join(scriptDirPath, 'web');
 
@@ -41,6 +43,22 @@ class DashboardService {
     final port = server.port;
     server.close();
     return port;
+  }
+
+  static void _checkInstruction() {
+    final instruction = switch (currentPlatform) {
+      SupportedPlatform.windows => 'where',
+      SupportedPlatform.macos => 'which',
+    };
+    final checkInstruction =
+        Process.runSync(instruction, ['dhttpd']).stdout.toString();
+    if (checkInstruction.trim().isNotEmpty) return;
+    throw DashboardServiceException(
+      '''
+dhttpd is not installed or not accessable from PATH. Please install it.
+https://pub.dev/packages/dhttpd
+''',
+    );
   }
 
   bool isRunning() {
