@@ -1,14 +1,16 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+# private_gitlab_notifier
 
+監聽私有的gitlab server的merge request 和comment，並發出系統通知。
 
-監聽私有的gitlab server的merge request 和comment，並發出系統通知
+支援Windows 及macos
 
-開發說明：\
-將`kenneth-hung/private-gitlab-notifier-dashboard`build 出的`build/web`放到本專案的根目錄下。
+## 說明
 
-使用說明：\
-把`dart compile *target_platform_here* -t bin/private_gitlab_notifier.dart` 後的執行檔，和`kenneth-hung/private-gitlab-notifier-dashboard`的`build/web`放到同一個目錄底下，就可以正常工作。
+需要準備下列兩個檔案
+1. [private-gitlab-notifier-dashboard](https://github.com/maple135790/private-gitlab-notifier-dashboard) build 出的`build/web`
+2. .env
+
+把以上的檔案，和`dart compile exe bin/private_gitlab_notifier.dart` 後的執行檔，放到同一個目錄底下，就可以正常工作。
 
 需要自行新增`.env`，格式如下：
 ```env
